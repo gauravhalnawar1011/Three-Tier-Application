@@ -1,4 +1,7 @@
+
 FROM nginx:alpine
+
+RUN apk add --no-cache gettext
 
 COPY index.html /usr/share/nginx/html/
 COPY app.js /usr/share/nginx/html/
