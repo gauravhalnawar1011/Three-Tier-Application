@@ -18,27 +18,27 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
  
+
 # --------------------------------------------------
 # Flask App
 # --------------------------------------------------
- 
+
 app = Flask(__name__)
- 
+
+# Allow requests from all origins (Demo / Lab only)
 CORS(
     app,
     resources={
         r"/*": {
-            "origins": os.getenv(
-                "CORS_ORIGINS",
-                "http://localhost:3000,http://<ec2_ip>:3000"
-            ).split(",")
+            "origins": "*"
         }
     },
     methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allow_headers=["Content-Type", "Authorization"],
 )
- 
+
 metrics = PrometheusMetrics(app)
+
 
 # --------------------------------------------------
 # Database Connection
