@@ -12,41 +12,59 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # Step 1: Checkout source code
       - name: Checkout code
         uses: actions/checkout@v4
 
+      # Step 2: Setup Docker Buildx
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
+      # Step 3: Login to Docker Hub
       - name: Login to Docker Hub
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_TOKEN }}
 
+      # Step 4: Define image tag using Git commit ID
+      - name: Generate Image Tag
+        run: echo "IMAGE_TAG=dev-${GITHUB_SHA}" >> $GITHUB_ENV
+
+      # Step 5: Build and Push Backend Image
       - name: Build and Push Backend
         uses: docker/build-push-action@v6
         with:
           context: ./backend
+          file: ./backend/Dockerfile
           push: true
           tags: |
-            ${{ secrets.DOCKER_HUB_USERNAME }}/my-webapp-backend:latest
-            ${{ secrets.DOCKER_HUB_USERNAME }}/my-webapp-backend:${{ github.sha }}
+            ${{ secrets.DOCKER_HUB_USERNAME }}/my-webapp-backend:${{ env.IMAGE_TAG }}
 
+      # Step 6: Build and Push Frontend Image
       - name: Build and Push Frontend
         uses: docker/build-push-action@v6
         with:
           context: ./frontend
+          file: ./frontend/Dockerfile
           push: true
           tags: |
-            ${{ secrets.DOCKER_HUB_USERNAME }}/my-webapp-frontend:latest
-            ${{ secrets.DOCKER_HUB_USERNAME }}/my-webapp-frontend:${{ github.sha }}
+            ${{ secrets.DOCKER_HUB_USERNAME }}/my-webapp-frontend:${{ env.IMAGE_TAG }}
 
+      # Step 7: Build and Push Database Image
       - name: Build and Push Database
         uses: docker/build-push-action@v6
         with:
           context: ./database
+          file: ./database/Dockerfile
           push: true
           tags: |
-            ${{ secrets.DOCKER_HUB_USERNAME }}/my-webapp-database:latest
-            ${{ secrets.DOCKER_HUB_USERNAME }}/my-webapp-database:${{ github.sha }}
+            ${{ secrets.DOCKER_HUB_USERNAME }}/my-webapp-database:${{ env.IMAGE_TAG }}
+
+      # Step 8: Display published image names
+      - name: Display Published Images
+        run: |
+          echo "Successfully published Docker images:"
+          echo "${{ secrets.DOCKER_HUB_USERNAME }}/my-webapp-backend:${IMAGE_TAG}"
+          echo "${{ secrets.DOCKER_HUB_USERNAME }}/my-webapp-frontend:${IMAGE_TAG}"
+          echo "${{ secrets.DOCKER_HUB_USERNAME }}/my-webapp-database:${IMAGE_TAG}"
