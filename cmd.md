@@ -237,7 +237,7 @@ docker run -d \
 | `--name my_postgres` | Names the container |
 | `--network mynetwork` | Connects it to the Docker network |
 | `--env-file .env` | Supplies PostgreSQL configuration |
-| `-v pgdata:...` | Persists database data |
+| `-v pgdata:...` | Persists database data | 
 | `--restart unless-stopped` | Restarts the container unless explicitly stopped |
 | `postgres:16` | Selects the PostgreSQL image |
 
